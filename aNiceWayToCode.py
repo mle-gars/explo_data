@@ -25,8 +25,8 @@ adjacency_table = {row["noeud_amont"]: row["noeud_aval"]\
 
 ####################################
 
-departs = explorator_df[explorator_df['type_aretes'] == 'depart'].to_numpy()
-finishes = explorator_df[explorator_df['type_aretes'] == 'arrivee'].to_numpy()
+departs = explorator_df[explorator_df['type_aretes'] == 'depart']['noeud_amont'].values
+finishes = explorator_df[explorator_df['type_aretes'] == 'arrivee']['noeud_aval'].values
 
 print(departs) # test print departs
 print(finishes) # test print finishes
