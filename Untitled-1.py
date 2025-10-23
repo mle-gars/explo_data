@@ -53,6 +53,7 @@ find_explorator_path(adjacency_table, departs, finishes)
 
 """
 
+
 class Explorator:
     def __init__ (self, start_node):
         self.current_node = start_node
@@ -60,7 +61,8 @@ class Explorator:
         self.total_distance = 0
 
     def __repr__(self):
-        return f"Explorator at node {self.current_node} with path {self.path} and total distance {self.total_distance}"
+        return f"Explorator at node {self.current_node} with path {self.path} \
+                    and total distance {self.total_distance}"
 
     def move_to(self, next_node, distance):
         self.current_node = next_node
@@ -73,12 +75,12 @@ class PathFinder:
         self.departs = departs
         self.finishes = finishes
 
-    def find_explorator_path_oop(self):
+    def find_explorator_path(self):
         for depart_node in self.departs:
             explorer = Explorator(depart_node)
             while explorer.current_node not in self.finishes:
                 next_node, current_distance = self.adjacency_table[explorer.current_node]
                 explorer.move_to(next_node, current_distance)
 
-            print(f"Path found: {explorer.path} starting with {explorer.path[0]}, ending with {explorer.path[-1]} and total distance {explorer.total_distance:<.3f} kms.")
-
+            print(f"Path found: {explorer.path} starting with {explorer.path[0]}, \
+                    ending with {explorer.path[-1]} and total distance {explorer.total_distance:<.3f} kms.")
