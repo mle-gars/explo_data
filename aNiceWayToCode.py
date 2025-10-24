@@ -2,7 +2,7 @@ import pandas as pd
 
 CSV_Path = 'parcours_explorateurs.csv'
 
-"""
+
 def prepare_data(explorator_df):
 
     adjacency_table = {row["noeud_amont"]: (row["noeud_aval"], row["distance"])\
@@ -50,35 +50,4 @@ explorator_df = pd.read_csv(CSV_Path)
 adjacency_table, departs, finishes = prepare_data(explorator_df)
 ### Find paths
 find_explorator_path(adjacency_table, departs, finishes)
-
-"""
-
-class Explorator:
-    def __init__ (self, start_node):
-        self.current_node = start_node
-        self.path = [start_node]
-        self.total_distance = 0
-
-    def __repr__(self):
-        return f"Explorator at node {self.current_node} with path {self.path} and total distance {self.total_distance}"
-
-    def move_to(self, next_node, distance):
-        self.current_node = next_node
-        self.path.append(next_node)
-        self.total_distance += distance
-
-class PathFinder:
-    def __init__(self, adjacency_table, departs, finishes):
-        self.adjacency_table = adjacency_table
-        self.departs = departs
-        self.finishes = finishes
-
-    def find_explorator_path_oop(self):
-        for depart_node in self.departs:
-            explorer = Explorator(depart_node)
-            while explorer.current_node not in self.finishes:
-                next_node, current_distance = self.adjacency_table[explorer.current_node]
-                explorer.move_to(next_node, current_distance)
-
-            print(f"Path found: {explorer.path} starting with {explorer.path[0]}, ending with {explorer.path[-1]} and total distance {explorer.total_distance:<.3f} kms.")
 
