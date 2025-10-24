@@ -1,63 +1,57 @@
-import pandas as pd
-
+import pandas
 from .explorator import Explorator
-from edge import Edge
+from .edge import Edge
 
-CSV_Path = 'parcours_explorateurs.csv'
 
 def prepare_data(explorator_df):
+	adjacent_table = {}
+	for _, row in explorator_df.iterrows():
+		upstream_node = row["noeud_amont"]
+		downstream_node = row["noeud_aval"]
+		edge_type = row["type_aretes"]
+		distance = row["distance"]
+		edge_id = row["arete_id"]
 
-    adjacency_table = {}
-    for _, row in explorator_df.iterrows():
-        upstream_node = row["noeud_amont"]
-        downstream_node = row["noeud_aval"]
-        distance = row["distance"]
-        edge_type = row["type_aretes"]
-        edge_id = row["arete_id"]
+		edge_object = Edge(upstream_node, downstream_node, edge_type, distance, edge_id)
+		adjacent_table[upstream_node] = edge_object
+	
+	starting_nodes = explorator_df[explorator_df["type_aretes"] == "depart"]["noeud_amont"].values
+	
+	ending_nodes = set(explorator_df[explorator_df["type_aretes"] == "arrivee"]["noeud_aval"].values)
 
-        edge_object = Edge(upstream_node, downstream_node, distance, edge_type, edge_id)
-        adjacency_table[upstream_node] = edge_object
-    
-    departs = explorator_df[explorator_df['type_aretes'] == 'depart']\
-                                ['noeud_amont'].values
-    
-    finishes = set(explorator_df[explorator_df['type_aretes'] == 'arrivee']\
-                                ['noeud_aval'].values)
-    
-    # print(departs) # test print departs
-    # print(finishes) # test print finishes
-    
-    return adjacency_table, departs, finishes
-    
-def find_explorator_path(adjacency_table, departs, finishes):
+	return adjacent_table, starting_nodes, ending_nodes
 
-    for depart_node in departs:          # for each depart node
-        current_path = [depart_node]     # initialize path with depart node
-        current_node = current_path[-1]  # get information about current position of the explorer
-        distance = 0                     # initialize distance traveled
-        
-        # while explorer has not reached finish
-        while current_node not in finishes:             
-            # get to next node/ current journey
-            next_node, current_distance = adjacency_table[current_node]   
-            # stock the node where explorer is at the end of the day
-            current_path.append(next_node)              
-            # actualize distance traveled
-            distance += current_distance                 
-            # actualize current position of the explorer
-            current_node = current_path[-1]             
 
-        # find the longest path and print it
-        
 
-        print(f"Path found: {current_path} starting with {current_path[0]}, ending with {current_path[-1]} and total distance {distance:<.3f} kms.")
-    
+def find_explorators_paths(adjacent_table, starting_nodes, ending_nodes):
+	# dans chaque itération on construit pour 1 explorateur
+	for index, starting_node in enumerate(starting_nodes):
+		starting_edge = adjacent_table[starting_node]
+		current_explorator = Explorator(explorator_id=index, starting_edge=starting_edge)
+		current_node = current_explorator.get_current_node() # on reccupère l'information lié à la position en cours de l'explorateur
 
-# Main execution
-## Load data
-explorator_df = pd.read_csv(CSV_Path)
-## Prepare data
-adjacency_table, departs, finishes = prepare_data(explorator_df)
-### Find paths
-find_explorator_path(adjacency_table, departs, finishes)
 
+		# tant que l'explorateur n'a pas atteint un des points finaux de l'exploration
+		while current_node not in ending_nodes: 
+			# la randonnée de la journée en cours : on réccupère le noeud de la fin de journée ainsi que la distance parcourue pdt la journée
+			next_edge = adjacent_table[current_node]
+
+			# on stocker la noeud où l'explorateur est arrivé en fin de journée
+			current_explorator.move_to_next_edge(next_edge)
+			
+			# on actualiser l'information lié à la position en cours de l'explorateur
+			current_node = current_explorator.get_current_node()
+		
+		print(f"La distance parcourue: {current_explorator.get_total_distance():.3f} Kms ")# prooo
+
+		print(current_explorator.path)
+		print("_"*20)			
+
+
+
+
+
+
+explorator_df = pandas.read_csv("./parcours_explorateurs.csv")
+adjacent_table, starting_nodes, ending_nodes = prepare_data(explorator_df)
+find_explorators_paths(adjacent_table, starting_nodes, ending_nodes)
