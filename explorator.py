@@ -1,10 +1,11 @@
 import pandas as pd
 
+
 CSV_Path = 'parcours_explorateurs.csv'
 
 class Explorator:
     def __init__ (self):
-        self.path = []
+        self.path = []  # list d'instances de la Classe Edge
 
     def move_to(self, next_node, distance):
         self.path.append(distance)  

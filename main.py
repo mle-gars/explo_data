@@ -1,12 +1,22 @@
 import pandas as pd
 
-CSV_Path = 'parcours_explorateurs.csv'
+from .explorator import Explorator
+from edge import Edge
 
+CSV_Path = 'parcours_explorateurs.csv'
 
 def prepare_data(explorator_df):
 
-    adjacency_table = {row["noeud_amont"]: (row["noeud_aval"], row["distance"])\
-                        for _, row in explorator_df.iterrows()}
+    adjacency_table = {}
+    for _, row in explorator_df.iterrows():
+        upstream_node = row["noeud_amont"]
+        downstream_node = row["noeud_aval"]
+        distance = row["distance"]
+        edge_type = row["type_aretes"]
+        edge_id = row["arete_id"]
+
+        edge_object = Edge(upstream_node, downstream_node, distance, edge_type, edge_id)
+        adjacency_table[upstream_node] = edge_object
     
     departs = explorator_df[explorator_df['type_aretes'] == 'depart']\
                                 ['noeud_amont'].values
